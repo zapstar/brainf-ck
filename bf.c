@@ -1,6 +1,5 @@
-/* BrainFuck interpreter
- *
- * NOTE: Cannot handle nested loops (notice I'm not using a stack here)
+/*
+ * BrainFuck interpreter
  */
 
 #include <errno.h>
@@ -8,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX_STK 512   /* Maximum size for stack  */
 #define MAX_LEN 30000 /* Maximum length for data */
 
 /* Read the file and give you the string buffer */
@@ -65,19 +65,33 @@ inline char *read_file(char *path, long int* read_len) {
 	return contents;
 }
 
-inline void evaluate(char *prog, long int plen) {
-	char data[MAX_LEN]; /* Data */
-	long int bal, dc = 0, pc = 0; /* Current data and program counters */
+inline int evaluate(char *prog, long int plen) {
+	unsigned char data[MAX_LEN]; /* Data */
+	unsigned short stack[MAX_STK]; /* Stack */
+	int sp = -1, dc = 0, pc = 0; /* Stack ptr, data and program counters */
+	int bal, rc = 0; /* Paren. balances, Return count */
 	/* Zero out the data array */
 	memset(data, 0, MAX_LEN * sizeof(char));
-	while (prog[pc] != '\0') {
+	while (prog[pc] != '\0' && pc < plen) {
 		switch (prog[pc]) {
 			/* Increment data pointer */
 			case '>':
+				/* If we exceed maximum data length */
+				if (dc + 1 >= MAX_LEN) {
+					fprintf(stderr, "Data ptr overflow\n");
+					rc = -1;
+					goto out;
+				}
 				++dc;
 				break;
 			/* Decrement data pointer */
 			case '<':
+				/* If we went below 0 */
+				if(dc - 1 < 0) {
+					fprintf(stderr,"Data ptr underflow\n");
+					rc = -2;
+					goto out;
+				}
 				--dc;
 				break;
 			/* Increment value at data pointer */
@@ -98,33 +112,66 @@ inline void evaluate(char *prog, long int plen) {
 				break;
 			/* Jump past ] if data pointer is zero */
 			case '[':
+				/*
+				 * If data pointer is zero
+				 * skip past the matching ]
+				 * and go out of the loop
+				 */
 				if (data[dc] == '\0') {
 					bal = 1;
-					while (bal != 0) {
+					while (bal > 0) {
 						++pc;
-						if (prog[pc] == '[')
+						if (pc >= plen) {
+							fprintf(stderr, "Unbalanced parenthesis\n");
+							rc = -3;
+							goto out;
+						} else if (prog[pc] == '[')
 							++bal;
 						else if (prog[pc] == ']')
 							--bal;
 					}
+				} else {
+					/* Push program ptr onto the stack */
+					if (sp + 1 >= MAX_STK) {
+						fprintf(stderr, "Stack Overflow\n");
+						rc = -4;
+						goto out;
+					}
+					stack[++sp] = pc;
 				}
 				break;
-			/* Jump past [ if data pointer is non-zero */
+			/*
+			 * Go back to the saved program
+			 * counter (pointing to matching ])
+			 * present on top of stack.
+			 * Also pop the stack
+			 * */
 			case ']':
-				if (data[dc] != '\0') {
-					bal = -1;
-					while (bal != 0) {
-						--pc;
-						if (prog[pc] == '[')
-							++bal;
-						else if (prog[pc] == ']')
-							--bal;
-					}
+				/* Check if stack is empty, error out */
+				if (sp == -1) {
+					fprintf(stderr, "Stack Underflow\n");
+					rc = -5;
+					goto out;
 				}
-				break;
+				pc = stack[sp--];
+				continue;
 		}
 		++pc;
 	}
+	/* Check for program counter overflow */
+	if (prog[pc] != '\0') {
+		fprintf(stderr, "Program counter overflow\n");
+		rc = -6;
+		goto out;
+	}
+	/* Check for stack not empty */
+	if (sp != -1) {
+		fprintf(stderr, "Unmatched left parenthesis\n");
+		rc = -7;
+		goto out;
+	}
+out:
+	return rc;
 }
 
 int main(int argc, char *argv[]) {
@@ -143,8 +190,8 @@ int main(int argc, char *argv[]) {
 		return 2;
 	}
 	/* Interpret the program read */
-	evaluate(buf, plen);
+	rc = evaluate(buf, plen);
 	/* Free allocated buffer */
 	free(buf);
-	return 0;
+	return rc;
 }
