@@ -1,6 +1,6 @@
 # Brainfuck Interpreter
 
-My sunday evening attempt on writing an interpreter for the BF language.
+My sunday evening attempt on writing an interpreter for the BF language. The interpreter is fairly complete with good amount of tests passing. Bug fixes/pull requests are always welcome.
 
 ## Tests
 
