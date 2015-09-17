@@ -1,10 +1,13 @@
 # Brainfuck Interpreter
 
-My sunday evening attempt on writing an interpreter for the BF language. The interpreter is fairly complete with good amount of tests passing. Bug fixes/pull requests are always welcome.
+My sunday evening attempt on writing an interpreter for the BF language in C. The interpreter is fairly complete with good amount of testing. Bug fixes/pull requests are always welcome.
+
+## Language specification
+Language details [here](http://www.muppetlabs.com/~breadbox/bf/) and [this Wikipedia article](https://en.wikipedia.org/wiki/Brainfuck).
 
 ## Tests
 
-Some tests to validate the interpreter. Some taken from [here](http://www.hevanet.com/cristofd/brainfuck/tests.b), please check their individual writeups.
+Some tests to validate the interpreter. Some taken from Daniel B Cristofani's page [here](http://www.hevanet.com/cristofd/brainfuck/tests.b), please check their individual writeups.
 
 * [hello.b](tests/hello.b) Customary "Hello, World!" program
 * [eol.b](tests/eol.b) End of line testing
@@ -16,6 +19,5 @@ Some tests to validate the interpreter. Some taken from [here](http://www.hevane
 * [stkoverflow.b](tests/stkoverflow.b) Stack Overflow test (left parenthesis)
 * [rightunmatch.b](tests/rightunmatch.b) Right paranthesis unmatched
 * [rot13.b](tests/rot13.b) ROT13 Cipher test
-* [numwarp.b](tests/numwarp.b) Numwarp test [Output Screenshot](http://www.hevanet.com/cristofd/brainfuck/numwarp.png)
+* [numwarp.b](tests/numwarp.b) Numwarp test ([Output Screenshot](http://www.hevanet.com/cristofd/brainfuck/numwarp.png))
 
-Language details [here](http://www.muppetlabs.com/~breadbox/bf/).
