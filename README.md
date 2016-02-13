@@ -1,6 +1,6 @@
-# Brainfuck Interpreter
+# Brainf*ck Interpreter
 
-My sunday evening attempt on writing an interpreter for the BF language in C. The interpreter is fairly complete with good amount of testing. Bug fixes/pull requests are always welcome.
+My sunday evening attempt on writing an interpreter for the Brainf*ck language in C. The interpreter is fairly complete with good amount of testing. Bug fixes/pull requests are always welcome.
 
 ## Language specification
 Language details [here](http://www.muppetlabs.com/~breadbox/bf/) and [this Wikipedia article](https://en.wikipedia.org/wiki/Brainfuck).
